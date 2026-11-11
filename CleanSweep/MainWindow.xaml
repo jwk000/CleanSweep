@@ -1,0 +1,250 @@
+<Window x:Class="CleanSweep.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:views="clr-namespace:CleanSweep.Views"
+        mc:Ignorable="d"
+        Title="净界 CleanSweep"
+        Width="1280" Height="840" MinWidth="1120" MinHeight="720"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" ResizeMode="CanResize"
+        Background="{StaticResource CanvasBrush}"
+        FontFamily="{StaticResource UiFont}"
+        TextOptions.TextFormattingMode="Display"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        StateChanged="Window_StateChanged"
+        Closing="Window_Closing">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="52" ResizeBorderThickness="6" CornerRadius="0"
+                            GlassFrameThickness="0" UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Border x:Name="WindowBorder" Background="{StaticResource CanvasBrush}"
+            BorderBrush="#DCE6E1" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="52" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Title bar -->
+            <Border Grid.Row="0" Background="#FBFCFB" BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="0,0,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="18,0,0,0"
+                                VerticalAlignment="Center">
+                        <Border Width="30" Height="30" CornerRadius="9" Background="{StaticResource GreenBrush}">
+                            <Grid>
+                                <Path Data="M 8,21 C 10,12 16,8 23,7 C 22,15 17,22 8,23 Z"
+                                      Fill="White" Stretch="None" />
+                                <Path Data="M 9,23 C 13,18 17,14 22,10" Stroke="{StaticResource GreenDarkBrush}"
+                                      StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                <Ellipse Width="3" Height="3" Fill="#BFF5D9" HorizontalAlignment="Right"
+                                         VerticalAlignment="Top" Margin="0,5,5,0" />
+                            </Grid>
+                        </Border>
+                        <TextBlock Text="净界" FontSize="15" FontWeight="SemiBold" Margin="10,0,0,0"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="CleanSweep" FontSize="11" Foreground="{StaticResource FaintBrush}"
+                                   Margin="8,1,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
+                        <Border x:Name="AdminBadge" Background="{StaticResource GreenSoftBrush}" CornerRadius="7"
+                                Padding="9,5" Margin="0,12,8,0" VerticalAlignment="Center"
+                                Visibility="{Binding IsElevated, Converter={StaticResource BoolToVisibility}}">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="6" Height="6" Fill="{StaticResource GreenBrush}"
+                                         VerticalAlignment="Center" />
+                                <TextBlock Text="管理员权限" FontSize="10.5" Foreground="{StaticResource GreenDarkBrush}"
+                                           Margin="6,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Button Style="{StaticResource GhostButton}" Command="{Binding ElevateCommand}"
+                                Padding="9,5" Margin="0,9,6,0"
+                                Visibility="{Binding IsElevated, Converter={StaticResource InverseBoolToVisibility}}"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                ToolTip="以管理员身份重启，可清理 Windows 临时目录、更新缓存和系统冗余">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE7EF;" FontFamily="{StaticResource IconFont}" FontSize="12"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="标准权限 · 提升" FontSize="10.5" Margin="5,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource WindowButton}" Click="Minimize_Click"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="最小化">
+                            <TextBlock Text="&#xE921;" FontFamily="{StaticResource IconFont}" FontSize="10" />
+                        </Button>
+                        <Button x:Name="MaximizeButton" Style="{StaticResource WindowButton}" Click="Maximize_Click"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="最大化">
+                            <TextBlock x:Name="MaximizeGlyph" Text="&#xE922;" FontFamily="{StaticResource IconFont}"
+                                       FontSize="10" />
+                        </Button>
+                        <Button Style="{StaticResource CloseWindowButton}" Click="Close_Click"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True" ToolTip="关闭">
+                            <TextBlock Text="&#xE8BB;" FontFamily="{StaticResource IconFont}" FontSize="10" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main area -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="218" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Sidebar -->
+                <Border Grid.Column="0" Background="{StaticResource SidebarBrush}"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Margin="0,20,0,0">
+                            <TextBlock Text="清理" Style="{StaticResource SectionLabel}" Margin="22,0,0,8" />
+                            <ListBox ItemsSource="{Binding NavItems}" SelectedItem="{Binding SelectedNavItem, Mode=TwoWay}"
+                                     Style="{StaticResource NavListBox}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Margin="14,0,14,16">
+                            <Border Background="#E2EFE8" CornerRadius="12" Padding="12">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE72E;" FontFamily="{StaticResource IconFont}"
+                                                   FontSize="14" Foreground="{StaticResource GreenDarkBrush}"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Text="100% 本地运行" FontSize="11.5" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource GreenDarkBrush}" Margin="7,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="扫描结果、清理日志和注册表备份都只保存在本机，不上传任何文件。"
+                                               FontSize="10.5" Foreground="{StaticResource MutedBrush}"
+                                               TextWrapping="Wrap" LineHeight="17" Margin="0,7,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <TextBlock Text="{Binding VersionText}" Style="{StaticResource Caption}"
+                                       Margin="2,10,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Page -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="32,24,32,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding PageTitle}" Style="{StaticResource H2}" />
+                            <TextBlock Text="{Binding PageSubtitle}" Style="{StaticResource Muted}" Margin="0,5,0,0" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Style="{StaticResource PrimaryButton}" Command="{Binding ScanCommand}"
+                                MinWidth="138" Height="42" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE721;" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                           Foreground="White" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding ScanButtonText}" Foreground="White" Margin="7,0,0,0"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Margin="32,20,32,0">
+                        <views:OverviewView Visibility="{Binding CurrentPage, Converter={StaticResource PageVisibility}, ConverterParameter=overview}" />
+                        <views:FindingsView Visibility="{Binding CurrentPage, Converter={StaticResource PageVisibility}, ConverterParameter=findings}" />
+                        <views:DuplicatesView Visibility="{Binding CurrentPage, Converter={StaticResource PageVisibility}, ConverterParameter=duplicates}" />
+                        <views:LogsView Visibility="{Binding CurrentPage, Converter={StaticResource PageVisibility}, ConverterParameter=logs}" />
+                        <views:SettingsView Visibility="{Binding CurrentPage, Converter={StaticResource PageVisibility}, ConverterParameter=settings}" />
+                    </Grid>
+
+                    <!-- Selection / action bar -->
+                    <Border Grid.Row="2" Background="#FBFCFB" BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="0,1,0,0" Visibility="{Binding ShowActionBar, Converter={StaticResource BoolToVisibility}}">
+                        <Grid Margin="30,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center" Margin="0,10">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding SelectedCountText}" FontSize="13" FontWeight="SemiBold" />
+                                    <TextBlock Text=" · " Foreground="{StaticResource FaintBrush}" />
+                                    <TextBlock Text="{Binding SelectedSizeText}" FontSize="13" FontWeight="SemiBold"
+                                               Foreground="{StaticResource GreenDarkBrush}" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding SelectedSubText}" Style="{StaticResource Caption}" Margin="0,2,0,0" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource SecondaryButton}" Command="{Binding SelectAllCommand}"
+                                        Content="{Binding SelectAllLabel}" Height="36" MinWidth="86" Margin="0,0,10,0"
+                                        Visibility="{Binding ShowSelectAll, Converter={StaticResource BoolToVisibility}}" />
+                                <Button Style="{StaticResource PrimaryButton}" Command="{Binding CleanCommand}"
+                                        Height="40" MinWidth="132">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE74D;" FontFamily="{StaticResource IconFont}" FontSize="13"
+                                                   Foreground="White" VerticalAlignment="Center" />
+                                        <TextBlock Text="清理选中项" Foreground="White" Margin="7,0,0,0"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- Busy overlay -->
+            <Grid Grid.RowSpan="2" Background="#D9F4F7F5" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}">
+                <Border Width="470" Background="White" CornerRadius="20" Padding="30,28"
+                        VerticalAlignment="Center" HorizontalAlignment="Center"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="38" Height="38" CornerRadius="11" Background="{StaticResource GreenSoftBrush}">
+                                <TextBlock Text="&#xE721;" FontFamily="{StaticResource IconFont}" FontSize="16"
+                                           Foreground="{StaticResource GreenDarkBrush}" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding BusyTitle}" FontSize="17" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding BusyStage}" Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <ProgressBar Value="{Binding BusyPercent, Mode=OneWay}" Maximum="100" Margin="0,24,0,0" />
+                        <TextBlock Text="{Binding BusyDetail}" Style="{StaticResource Muted}" Margin="0,12,0,0"
+                                   TextTrimming="CharacterEllipsis" MaxHeight="42" />
+                        <TextBlock Text="{Binding BusyStats}" Style="{StaticResource Caption}" Margin="0,10,0,0" />
+
+                        <Button Style="{StaticResource SecondaryButton}" Command="{Binding CancelCommand}"
+                                Content="取消" HorizontalAlignment="Right" Height="36" MinWidth="82"
+                                Margin="0,22,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
