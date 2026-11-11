@@ -6,6 +6,8 @@
 - **界面干净**：四类规则分页展示，支持逐项查看依据、逐项勾选。
 - **完全离线**：不发起网络请求，不上传文件名、路径或日志。
 - **目标系统**：Windows 10 1903+ / Windows 11（系统自带 .NET Framework 4.8）。
+- **GitHub**：[jwk000/CleanSweep](https://github.com/jwk000/CleanSweep)
+- **发布包**：[v1.0.0](https://github.com/jwk000/CleanSweep/releases/tag/v1.0.0)
 
 ![净界 CleanSweep 概览](screenshots/overview.png)
 
