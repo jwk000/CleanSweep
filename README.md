@@ -2,7 +2,7 @@
 
 一个**可解释、可追溯**的 Windows 清理工具。它不会“一键清空”，而是先只读扫描、列出每一项、说明删除依据，再由你确认清理。
 
-- **绿色单文件**：`release/CleanSweep/CleanSweep.exe`，约 250 KB，无安装、无 DLL、无外部依赖。
+- **绿色单文件**：`dist/CleanSweep.exe`，约 250 KB，无安装、无 DLL、无外部依赖。
 - **界面干净**：四类规则分页展示，支持逐项查看依据、逐项勾选。
 - **完全离线**：不发起网络请求，不上传文件名、路径或日志。
 - **目标系统**：Windows 10 1903+ / Windows 11（系统自带 .NET Framework 4.8）。
@@ -11,7 +11,7 @@
 
 ## 快速开始
 
-1. 双击 `release/CleanSweep/CleanSweep.exe`。
+1. 双击 `dist/CleanSweep.exe`。
 2. 点击“开始扫描”。扫描阶段只读，不会修改任何文件。
 3. 点击“查看”进入分类，展开“依据”确认路径、时间条件或哈希。
 4. 勾选要处理的项目，点击“清理选中项”。
@@ -101,7 +101,7 @@
 需要 .NET SDK（能编译 `net48`）和 .NET Framework 4.8 Targeting Pack：
 
 ```powershell
-dotnet build .\CleanSweep\CleanSweep.csproj -c Release -o .\release\CleanSweep
+dotnet build .\CleanSweep\CleanSweep.csproj -c Release -o .\dist
 ```
 
 输出只有一个 `CleanSweep.exe`，不会生成 `.exe.config` 或 DLL。
@@ -109,7 +109,7 @@ dotnet build .\CleanSweep\CleanSweep.csproj -c Release -o .\release\CleanSweep
 自检（在临时目录创建样本，验证重复分组、路径保护、文件遍历、清理日志后自动清理样本）：
 
 ```powershell
-.\release\CleanSweep\CleanSweep.exe --self-test
+.\dist\CleanSweep.exe --self-test
 # 结果：%TEMP%\CleanSweepSelfTest-result.txt
 ```
 
@@ -140,12 +140,8 @@ CleanSweep/
   Views/        概览、分类、重复文件、日志、设置、确认/报告窗口
   Themes/       颜色、控件样式、字体
   Assets/       应用图标
-release/
-  CleanSweep/
-    CleanSweep.exe
-    README.txt
-    SHA256.txt
-    screenshots/overview.png
+dist/
+  CleanSweep.exe
 screenshots/
   overview.png
 README.md
